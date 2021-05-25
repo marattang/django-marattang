@@ -5,19 +5,34 @@ class Melon(object):
 
     url = ''
     hdr = {'User-Agent': 'Mozilla/5.0'}
+    class_name = []
 
     def __str__(self):
         return f'입력된 URL은 {self.url}입니다.'
 
-    @staticmethod
-    def printRanking(soup, value, type):
+    def set_class_name(self, class_name):
+        self.class_name = class_name
+
+    def printRanking(self):
+        req = urllib.request.Request(self.url, headers=self.hdr)
+        soup = BeautifulSoup(urllib.request.urlopen(req).read(), 'lxml')
+
         count = 0
-        for i in soup.find_all(name='div', attrs=({"class":value})):
+        for i in soup.find_all(name='div', attrs=({"class":self.class_name[0]})):
             count += 1
             print(f'{str(count)} RANKING')
-            print(f'{type}: {i.find("a").text}')
+            print(f'title: {i.find("a").text}')
 
-# https://www.melon.com/chart/index.htm
+        count = 0
+        for i in soup.find_all(name='div', attrs=({"class":self.class_name[1]})):
+            count += 1
+            print(f'{str(count)} RANKING')
+            print(f'artist: {i.find("a").text}')
+
+    def set_url(self):
+        self.url = f'https://www.melon.com/chart/index.htm?dayTime={time}'
+
+# https://www.melon.com/chart/index.htm?dayTime={time}
     @staticmethod
     def main():
         mel = Melon()
@@ -27,13 +42,11 @@ class Melon(object):
                 break
             elif menu == '1':
                 mel.url = input("Input URL")
+                mel.time = input('time 예 : 2020122414')
             elif menu == '2':
-                print(f'Input URL is {mel.url} 입니다.')
-                req = urllib.request.Request(mel.url, headers=mel.hdr)
-                soup = BeautifulSoup(urllib.request.urlopen(req).read(), 'lxml')
-
-                Melon.printRanking(soup, "ellipsis rank01", 'title')
-                Melon.printRanking(soup, "ellipsis rank02", 'artist')
+                mel.class_name.append('ellipsis rank01')
+                mel.class_name.append('ellipsis rank02')
+                mel.printRanking()
             else:
                 print('Wrong Number')
                 continue
