@@ -4,33 +4,31 @@ import urllib.request
 class Melon(object):
 
     url = ''
+    url_base = 'https://www.melon.com/chart/index.htm'
     hdr = {'User-Agent': 'Mozilla/5.0'}
-    class_name = []
+    rank_dict = {}
 
     def __str__(self):
         return f'입력된 URL은 {self.url}입니다.'
 
-    def set_class_name(self, class_name):
-        self.class_name = class_name
+    def set_url(self):
+        self.url = f'{self.url_base} + ?dayTime={(input("Time ex 2021052616:"))}'
 
-    def printRanking(self):
+    def get_raking(self):
         req = urllib.request.Request(self.url, headers=self.hdr)
         soup = BeautifulSoup(urllib.request.urlopen(req).read(), 'lxml')
 
-        count = 0
-        for i in soup.find_all(name='div', attrs=({"class":self.class_name[0]})):
-            count += 1
-            print(f'{str(count)} RANKING')
-            print(f'title: {i.find("a").text}')
+        for i in soup.findAll(name="table")[0].tbody.findAll('tr'):
 
-        count = 0
-        for i in soup.find_all(name='div', attrs=({"class":self.class_name[1]})):
-            count += 1
-            print(f'{str(count)} RANKING')
-            print(f'artist: {i.find("a").text}')
+            self.rank_dict[i.findAll("td")[3].div.div.find(name="a").text] = i.findAll("td")[3].div.findAll("div")[2].find(name="a").text
 
     def set_url(self):
-        self.url = f'https://www.melon.com/chart/index.htm?dayTime={time}'
+
+        self.url = f'https://www.melon.com/chart/index.htm?dayTime={input("INPUT URL")}'
+
+    def print_raking(self):
+        for key in self.rank_dict:
+            print(f'rank_dict의 {key} : {self.rank_dict[key]}')
 
 # https://www.melon.com/chart/index.htm?dayTime={time}
     @staticmethod
@@ -41,12 +39,12 @@ class Melon(object):
             if menu == '0':
                 break
             elif menu == '1':
-                mel.url = input("Input URL")
-                mel.time = input('time 예 : 2020122414')
+                mel.set_url()
             elif menu == '2':
-                mel.class_name.append('ellipsis rank01')
-                mel.class_name.append('ellipsis rank02')
-                mel.printRanking()
+                # pass
+                mel.get_raking()
+            elif menu == '3':
+                mel.print_raking()
             else:
                 print('Wrong Number')
                 continue
