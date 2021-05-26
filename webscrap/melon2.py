@@ -1,35 +1,42 @@
-import requests
 from bs4 import BeautifulSoup
+import requests
 
 
 class Melon(object):
+    urlbase = 'https://www.melon.com/chart/index.htm?dayTime='
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    class_name = []
     url = ''
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko'}
+
+    def set_url(self, time):
+        self.url = requests.get(f'{self.urlbase}{time}', headers=self.headers).text
+
+    def get_ranking(self):
+        soup = BeautifulSoup(self.url, 'lxml')
+        print('------- 제목 --------')
+        ls = soup.find_all("div", {"class": self.class_name[0]})
+        for i in ls:
+            print(f' {i.find("a").text}')
+        print('------ 가수 --------')
+        ls = soup.find_all("div", {"class": self.class_name[1]})
+        for i in ls:
+            print(f' {i.find("a").text}')
+
     @staticmethod
     def main():
         melon = Melon()
         while 1:
-            menu = int(input('0. Exit\n  1. Input URL 2.Title Ranking\n 3.Artist Ranking'))
-            if menu == 0:
+            menu = input('0-exit, 1-input time, 2-output')
+            if menu == '0':
                 break
-            elif menu == 1:
-                melon.url = requests.get(input('url을 입력하세요'), headers=melon.headers).text
-            elif menu == 2:
-                soup = BeautifulSoup(melon.url, 'lxml')
-                count = 0
-                for i in soup.find_all("div", {"class":"ellipsis rank01"}):
-                    count += 1
-                    print(f'{str(count)} 위')
-                    print(f' Title: {i.find("a").text}')
-            elif menu == 3:
-                soup = BeautifulSoup(melon.url, 'lxml')
-                count = 0
-                for i in soup.find_all("div", {"class":"ellipsis rank02"}):
-                    count += 1
-                    print(f'{str(count)} 위')
-                    print(f'Artist: {i.find("a").text}')
+            elif menu == '1':
+                melon.set_url(input('스크래핑할 날짜 입력'))  # '2021052511'
+            elif menu == '2':
+                melon.class_name.append('ellipsis rank01')
+                melon.class_name.append('ellipsis rank02')
+                melon.get_ranking()
             else:
-                print('다시 입력하세요')
+                print('Wrong number')
                 continue
-                # https://www.melon.com/chart/index.htm
+
 Melon.main()
