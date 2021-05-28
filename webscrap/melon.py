@@ -1,3 +1,4 @@
+import pandas as pd
 from bs4 import BeautifulSoup
 import urllib.request
 
@@ -7,6 +8,7 @@ class Melon(object):
     url_base = 'https://www.melon.com/chart/index.htm'
     hdr = {'User-Agent': 'Mozilla/5.0'}
     rank_dict = {}
+    rank_df = None
 
     def __str__(self):
         return f'입력된 URL은 {self.url}입니다.'
@@ -30,6 +32,13 @@ class Melon(object):
         for key in self.rank_dict:
             print(f'rank_dict의 {key} : {self.rank_dict[key]}')
 
+    def melon_to_df(self):
+        self.rank_df = pd.DataFrame.from_dict(self.rank_dict, orient='index')
+
+    def melon_to_csv(self):
+        path = './data/melon.csv'
+        self.rank_df.to_csv(path, encoding='utf-8-sig', na_rep='NaN')
+
 # https://www.melon.com/chart/index.htm?dayTime={time}
     @staticmethod
     def main():
@@ -45,6 +54,10 @@ class Melon(object):
                 mel.get_raking()
             elif menu == '3':
                 mel.print_raking()
+            elif menu == '4':
+                mel.melon_to_df()
+            elif menu == '5':
+                mel.melon_to_csv()
             else:
                 print('Wrong Number')
                 continue
