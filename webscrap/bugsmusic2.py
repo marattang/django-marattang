@@ -7,6 +7,7 @@ class BugsMusic(object):
     title_ls = []
     artist_ls = []
     dict = {}
+
     def set_url(self, detail):
 
         self.url = requests.get(f'{self.url}{detail}', headers=self.headers).text
@@ -17,7 +18,6 @@ class BugsMusic(object):
         ls2 = soup.find_all(name='p', attrs=({"class":self.class_name[0]}))
         for i in ls1:
             self.title_ls.append(i.find("a").text)
-
 
     def insert_title_dict(self):
         pass

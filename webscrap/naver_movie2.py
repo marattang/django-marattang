@@ -16,7 +16,7 @@ class NaverMovie(object):
 
         soup = BeautifulSoup(chromedriver.page_source, 'html.parser')
         data = soup.find_all(name='div', attrs={"class":self.classes})
-        self.rank_dict = {i:j.a.text for i, j in enumerate(data)}
+        self.rank_dict = {i+1:j.a.text for i, j in enumerate(data)}
         chromedriver.close()
 
     def dict_to_df(self):

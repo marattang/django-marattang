@@ -18,7 +18,7 @@ class Dataset(object):
     @property
     def fname(self) -> str: return self._fname
     @fname.setter
-    def fname(self, fnmae): self._fname = fnmae
+    def fname(self, fname): self._fname = fname
 
     @property
     def train(self) -> str: return self._train
