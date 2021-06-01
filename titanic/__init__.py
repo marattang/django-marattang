@@ -6,10 +6,11 @@ if __name__ == '__main__':
     controller = Controller()
 
     while 1:
-        menu = input('0.Exit 1.data visualization\n'
-                     '2. modeling\n '
-                     '3. machine learning\n'
-                     '4. machine release')
+        menu = input('0.Exit 1. \n'
+                     '2.data visualization\n'
+                     '3. modeling\n '
+                     '4. machine learning\n'
+                     '5. machine release')
 
         if menu == '0':
             break
@@ -21,7 +22,7 @@ if __name__ == '__main__':
             plot.draw_embarked()
 
         elif menu == '2':
-            controller.modeling('train.csv', 'test.csv')
+            df = controller.modeling('train.csv', 'test.csv')
         elif menu == '3':
             pass
         elif menu == '4':
