@@ -1,12 +1,11 @@
-import numpy as np
-
 from titanic.model.dataset import Dataset
-from pandas import Series, DataFrame
+import numpy as np
 import pandas as pd
-
+from sklearn.svm import SVC
+from sklearn.model_selection import KFold
+from sklearn.model_selection import cross_val_score
 
 class Service(object):
-
     dataset = Dataset()
 
     def new_model(self, payload) -> object:
@@ -50,6 +49,7 @@ class Service(object):
         bins = [-1, 8, 14, 31, np.inf]
         for these in this.train, this.test:
             these['FareBand'] = pd.cut(these['Fare'], bins=bins, labels=[1, 2, 3, 4])
+        this.test['FareBand'] = this.test['Fare'].fillna(1)
         return this
 
     @staticmethod
@@ -100,6 +100,16 @@ class Service(object):
         return this
 
     @staticmethod
-    def create_k_fold(this) -> object:
-        return
-    
+    def create_k_fold() -> object:
+        return KFold(n_splits=10, shuffle=True, random_state=0)
+
+    def accuracy_by_svm(self, this):
+        score = cross_val_score(SVC(),
+                                this.train,
+                                this.label,
+                                cv=KFold(n_splits=10,
+                                         shuffle=True,
+                                         random_state=0),
+                                n_jobs=1,
+                                scoring='accuracy')
+        return round(np.mean(score) * 100, 2)

@@ -24,9 +24,9 @@ if __name__ == '__main__':
         elif menu == '2':
             df = controller.modeling('train.csv', 'test.csv')
         elif menu == '3':
-            pass
+            df = controller.learning('train.csv', 'test.csv')
         elif menu == '4':
-            pass
+            df = controller.submit('train.csv', 'test.csv')
         else:
             print('wrong number')
             continue

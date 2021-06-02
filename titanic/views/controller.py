@@ -1,5 +1,8 @@
+import pandas as pd
+
 from titanic.model.dataset import Dataset
 from titanic.model.service import Service
+from sklearn.ensemble import RandomForestClassifier
 
 class Controller(object):
 
@@ -14,6 +17,17 @@ class Controller(object):
         print(f'this train : {this.train}')
         print(f'this label : {this.label}')
         return this # 데이터프레임
+
+    def learning(self, train, test):
+        this = self.modeling(train, test)
+        print(f'사이킷 런의 SVC 알고리즘 정확도 {self.service.accuracy_by_svm(this)} %')
+
+    def submit(self, train, test):
+        this = self.modeling(train, test)
+        clf = RandomForestClassifier()
+        clf.fit(this.train, this.label)
+        prediction = clf.predict(this.train)
+        pd.DataFrame({'PassengerId': this.id, 'Survived': prediction}).to_csv('./data/submission.csv', index=False)
 
     def preprocess(self, train, test) -> object:
         service = self.service
