@@ -1,3 +1,5 @@
+import numpy as np
+
 from titanic.model.dataset import Dataset
 from pandas import Series, DataFrame
 import pandas as pd
@@ -19,14 +21,15 @@ class Service(object):
     def create_train(this) -> object:
         return this.train.drop("Survived", axis=1) #생사여부 제외 return
 
-    @staticmethod
+    @staticmethod #답안지
     def create_label(this) -> object:
         return this.train['Survived'] #생사여부만 return
 
     @staticmethod
-    def drop_feature(this, feature) -> object:
-        this.train = this.train.drop([feature], axis=1)
-        this.test = this.test.drop([feature], axis=1)
+    def drop_feature(this, *feature) -> object:
+        for i in feature:
+            this.train = this.train.drop([i], axis=1)
+            this.test = this.test.drop([i], axis=1)
         return this
 
     @staticmethod
@@ -36,6 +39,17 @@ class Service(object):
         this.train["Embarked"] = this.train["Embarked"].map({'S':1, 'C':2, 'Q':3})
         # map함수를 사용해 S : 1, C: 2, Q : 3
 
+        return this
+
+    @staticmethod
+    def fare_ordinal(this) -> object:
+        this.test['Fare'] = this.test['Fare'].fillna(1)
+        # this.test['Fare'].fillna(1)
+        this.train['FareBand'] = pd.qcut(this.train['Fare'], 4)
+        print(f'qcut으로 bins 값 설정 {this.train.head()}')
+        bins = [-1, 8, 14, 31, np.inf]
+        for these in this.train, this.test:
+            these['FareBand'] = pd.cut(these['Fare'], bins=bins, labels=[1, 2, 3, 4])
         return this
 
     @staticmethod
@@ -72,6 +86,17 @@ class Service(object):
 
     @staticmethod
     def age_ordinal(this) -> object:
+        train = this.train
+        test = this.test
+        train['Age'] = train['Age'].fillna(-0.5)
+        test['Age'] = test['Age'].fillna(-0.5)
+        bins = [-1, 0, 5, 12, 18, 24, 35, 60, np.inf] #구간을 잡아내기 위해서 처리하는 것.
+        labels = ['Unknown', 'Baby', 'Child', 'Teenager', 'Student', 'Young Adult', 'Adult', 'Senior']
+        age_title_mapping = {'Unknown': 0, 'Baby': 1, 'Child': 2, 'Teenager': 3, 'Student': 4, 'Young Adult': 5,
+                             'Adult': 6, 'Senior': 7}
+        for dataset in (train, test):
+            dataset['AgeGroup'] = pd.cut(dataset['Age'], bins=bins, labels=labels) # {[labels]:[bins]}
+            dataset['AgeGroup'] = dataset['AgeGroup'].map(age_title_mapping)
         return this
 
     @staticmethod

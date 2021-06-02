@@ -1,12 +1,14 @@
+import pandas as pd
 from selenium import webdriver
 from bs4 import BeautifulSoup
+
 
 class Naverstock(object):
     url = "https://finance.naver.com/sise/sise_market_sum.nhn"
     driver_path = 'C:/Program Files/Google/Chrome/chromedriver'
     classes = ''
     corp_nm = []
-    crop_cd = []
+    corp_cd = []
     realtime_price = []
     realtime_rate = []
     market_cap = []
@@ -17,27 +19,24 @@ class Naverstock(object):
         chrome_driver.get(self.url)
         soup = BeautifulSoup(chrome_driver.page_source, 'html.parser')
         data = soup.find_all('tr', attrs=({"onmouseover":"mouseOver(this)"}))
-        # print(data)
-        # corp_nm
-        for i in data:
-            print(i.find_all("td")[1].a.text)
-        # corp_cd
 
-        # realtime_price
         for i in data:
-            print(i.find_all("td")[2].text)
-        # realtime_rate
-        for i in data:
-            print(i.find_all("td")[3].span.text)
-        # market_cap
-        for i in data:
-            print(i.find_all("td")[5].text)
+            self.corp_nm.append(i.find_all("td")[1].a.text)
+            self.corp_cd.append(i.find_all("td")[1].a['href'].split('=')[1])
+            self.realtime_price.append(i.find_all("td")[2].text)
+            self.realtime_rate.append(i.find_all("td")[4].span.text.replace('\t', '').replace('\n', ''))
+            self.market_cap.append(i.find_all("td")[6].text)
+
         chrome_driver.close()
-    def to_dataframe(self):
-        pass
 
-    def to_csv(self):
-        pass
+    def to_dataframe(self):
+        self.df = pd.DataFrame(data={'corp_cd':self.corp_cd,'corp_nm':self.corp_nm,'realtime_price':self.realtime_price,'realtime_rate':self.realtime_rate,'market_cap':self.market_cap})
+        print(self.df)
+
+    def df_to_csv(self):
+        path = './data/naver_stock.csv'
+
+        self.df.to_csv(path, na_rep='NaN', sep=',')
 
     @staticmethod
     def main():
@@ -49,9 +48,9 @@ class Naverstock(object):
             elif menu == '1':
                 naver.get_data()
             elif menu == '2':
-                pass
+                naver.to_dataframe()
             elif menu == '3':
-                pass
+                naver.df_to_csv()
             else:
                 print("wrong number")
                 continue
